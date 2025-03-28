@@ -37,7 +37,7 @@ When transferring between brokerages, you need to know which purchases remain af
 ## Usage
 
 1. Place your trade data CSV file in the same directory as the script
-2. By default, the script expects a file named `sample.csv`. If your file has a different name, edit the `input_file` variable in the `main()` function
+2. By default, the script expects a file named `mishraji_trades.csv`. If your file has a different name, edit the `input_file` variable in the `main()` function
 3. Run the script:
    ```
    python fifo_processor.py
