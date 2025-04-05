@@ -1,5 +1,3 @@
-# fifo-trades-processing
-
 # FIFO Trade Processor
 
 This project processes trading data to determine remaining purchases after applying the First-In-First-Out (FIFO) matching method between buys and sells.
@@ -9,9 +7,10 @@ This project processes trading data to determine remaining purchases after apply
 When transferring between brokerages, you need to know which purchases remain after all sales have been accounted for. This script:
 
 1. Processes your trading data in CSV format
-2. Applies the FIFO method to match sales with purchases
-3. Outputs a list of remaining purchases and their quantities
-4. Generates a summary of holdings by company
+2. Aggregates same-day purchases for each security with weighted average pricing
+3. Applies the FIFO method to match sales with purchases
+4. Outputs a list of remaining purchases and their quantities
+5. Generates a summary of holdings by company
 
 ## Requirements
 
@@ -64,11 +63,20 @@ The script expects a CSV file with the following columns:
 ## Features
 
 - Preserves original order of trades
-- Properly handles same-date trades
-- Warns if trades appear to be out of chronological order
+- Properly handles same-date trades by aggregating buys with weighted average pricing
+- Skips processing for securities with trades not in chronological order
 - Calculates remaining shares and their cost basis
 - Provides summary statistics by company
 - Handles various data format issues gracefully
+
+## Same-Day Trade Aggregation
+
+A key feature of this processor is the aggregation of same-day purchases:
+
+- When multiple purchases of the same security occur on the same date, they are combined into a single entry
+- The quantity becomes the sum of all purchases for that day
+- The price becomes the weighted average price of all purchases for that day
+- This simplifies the portfolio and provides a more accurate cost basis
 
 ## Output Format
 
@@ -78,11 +86,12 @@ Contains all purchases with shares remaining after FIFO processing:
 - Segment: Market segment
 - TradeDate: Original purchase date
 - BuyQty: Original quantity purchased
-- BuyPrice: Purchase price per share
+- BuyPrice: Purchase price per share (or weighted average for aggregated purchases)
 - RemainingQty: Number of shares remaining after FIFO processing
 - RemainingCost: Total cost of remaining shares
 - ClientCode: Your client identifier
-- OrderNo: Original order reference number
+- OrderNo: Original order reference number (or "Aggregated-{date}" for aggregated purchases)
+- NumTrades: Number of trades aggregated into this entry
 
 ### remaining_summary.csv
 Provides aggregated information by company:
@@ -97,4 +106,5 @@ Provides aggregated information by company:
 
 - The script preserves the original order of trades in your input file
 - FIFO matching assumes trades should be processed in chronological order
-- The script will warn you if trades appear to be out of sequence
+- The script will skip securities with trades that appear to be out of sequence
+- Same-day trades for the same security are consolidated with weighted average pricing
